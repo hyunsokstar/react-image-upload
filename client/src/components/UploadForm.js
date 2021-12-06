@@ -34,7 +34,7 @@ function UploadForm() {
     addedNewImageId,
     setAddedNeewImageId,
   } = useContext(ImageContext);
-  const [percent, setPercent] = useState(0);
+  const [percent, setPercent] = useState([]);
   const [files, setFiles] = useState(null);
   const [previews, setPreviews] = useState([]);
   const [fileNamesToUpload, setFileNamesToUpload] = useState([]);
@@ -63,7 +63,7 @@ function UploadForm() {
     return (
       // 33 프로그래스바 추가
       <div style={{ display: "flex", flexWrap: "wrap", width: "49%" }}>
-        {previews.length > 0 ? <ProgressBar percent={percent} /> : ""}
+        {previews.length > 0 ? <ProgressBar percent={percent[index]} /> : ""}
         <img key={index} src={preview.imgSrc} alt="" />
       </div>
     );
@@ -112,8 +112,13 @@ function UploadForm() {
           // 11 axios 이벤트로부터 progressbar 출력 설정 하기
           return axios.post(presigned.url, formData, {
             onUploadProgress: (e) => {
-              console.log("e : ", e.loaded);
-              setPercent(Math.round((100 * e.loaded) / e.total));
+              console.log("e.loaded : ", e.loaded);
+              // setPercent(Math.round((100 * e.loaded) / e.total));
+              setPercent((prevData) => {
+                const newData = [...prevData];
+                newData[index] = Math.round((100 * e.loaded) / e.total);
+                return newData;
+              });
             },
           });
         })
